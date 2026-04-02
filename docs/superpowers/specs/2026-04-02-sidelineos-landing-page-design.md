@@ -20,8 +20,8 @@ A single-page waitlist landing site for **SidelineOS**, an AI-driven club operat
 
 ## Typography
 
-- **Headlines:** Inter or Outfit, bold, uppercase, tight letter-spacing
-- **Body:** Same family, regular weight, normal case
+- **Headlines:** Inter (Google Fonts), bold, uppercase, tight letter-spacing
+- **Body:** Inter, regular weight, normal case
 - **Sizes:** Responsive — large hero headline scaling down for mobile
 
 ## Page Structure
@@ -111,13 +111,25 @@ Visual hierarchy should emphasize DOC as the top tier (largest or most prominent
 
 ## Email Capture
 
-- For MVP/waitlist phase: form submits to a simple endpoint (Formspree, Netlify Forms, or a future backend)
+- Both hero and final CTA forms share the same submission handler
+- For MVP/waitlist phase: form submits to Formspree (free tier, no backend needed)
 - Input validation: basic email format check in JS before submit
 - Success state: inline confirmation message replacing the form
+- Error state: inline "Something went wrong, try again" message on network failure
+- Loading state: button text changes to "Submitting..." while request is in flight
+
+## Accessibility
+
+- All interactive elements (inputs, buttons) have visible focus states (green outline)
+- Form inputs have associated `<label>` elements (visually hidden if needed)
+- CTA buttons use sufficient contrast (dark text on `#00FF87` passes WCAG AA)
+- Semantic HTML: `<header>`, `<main>`, `<section>`, `<footer>`
+- Images/icons include `alt` text or `aria-label`
 
 ## Responsive Behavior
 
-- **Desktop:** Full-width sections, multi-column grids
+- **Container max-width:** 1200px, centered
+- **Desktop:** Full-width section backgrounds, content constrained to max-width
 - **Tablet:** 2-column grids collapse where needed
 - **Mobile:** Single column, stacked layout, adjusted font sizes
 - **Breakpoints:** 768px (tablet), 480px (mobile)
