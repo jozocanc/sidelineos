@@ -390,3 +390,64 @@ body {
     color: var(--color-gray);
     font-size: 0.8rem;
 }
+
+/* === Responsive === */
+
+/* Tablet */
+@media (max-width: 768px) {
+    :root {
+        --section-padding: 70px 0;
+    }
+
+    .problems__grid,
+    .features__grid,
+    .tiers__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .steps {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .step__connector {
+        width: 2px;
+        height: 40px;
+        background: linear-gradient(180deg, var(--color-green), transparent);
+    }
+
+    .card--tier-doc {
+        transform: scale(1);
+    }
+
+    .site-footer__inner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    :root {
+        --section-padding: 50px 0;
+    }
+
+    .problems__grid,
+    .features__grid,
+    .tiers__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .waitlist-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .waitlist-form input[type="email"] {
+        width: 100%;
+    }
+
+    .waitlist-form .btn {
+        width: 100%;
+    }
+}
