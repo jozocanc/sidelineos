@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // === Waitlist Form Handling ===
 // IMPORTANT: Replace YOUR_FORM_ID with your actual Formspree form ID.
 // Create one at https://formspree.io (free tier works).
-const FORMSPREE_URL = 'https://formspree.io/f/YOUR_FORM_ID';
+const FORMSPREE_URL = 'https://formspree.io/f/mlgowzdl';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
