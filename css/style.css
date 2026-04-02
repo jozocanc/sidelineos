@@ -183,3 +183,61 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
+/* === Problems === */
+.problems {
+    padding: var(--section-padding);
+}
+
+.problems__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+/* === Cards (shared) === */
+.card {
+    background: var(--color-dark-secondary);
+    border-radius: 12px;
+    padding: 32px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 255, 135, 0.1);
+}
+
+.card__icon {
+    color: var(--color-green);
+    margin-bottom: 16px;
+}
+
+.card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.card__text {
+    color: var(--color-gray);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* === Features === */
+.features {
+    padding: var(--section-padding);
+    background: var(--color-dark-secondary);
+}
+
+.features__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.card--feature {
+    background: var(--color-dark);
+}
