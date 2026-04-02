@@ -241,3 +241,94 @@ body {
 .card--feature {
     background: var(--color-dark);
 }
+
+/* === How It Works === */
+.how-it-works {
+    padding: var(--section-padding);
+}
+
+.steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
+.step {
+    text-align: center;
+    flex: 1;
+    max-width: 280px;
+    padding: 0 20px;
+}
+
+.step__number {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-green);
+    color: var(--color-dark);
+    font-weight: 900;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.step__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.step__text {
+    color: var(--color-gray);
+    font-size: 0.9rem;
+}
+
+.step__connector {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-green), transparent);
+    flex-shrink: 0;
+}
+
+/* === Tiers / Who It's For === */
+.tiers {
+    padding: var(--section-padding);
+    background: var(--color-dark-secondary);
+}
+
+.tiers__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.card--tier {
+    background: var(--color-dark);
+    text-align: center;
+    padding: 40px 32px;
+}
+
+.card--tier-doc {
+    border: 2px solid var(--color-green);
+    position: relative;
+    transform: scale(1.05);
+}
+
+.card--tier-doc::before {
+    content: 'COMMAND CENTER';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-green);
+    color: var(--color-dark);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    padding: 4px 14px;
+    border-radius: 20px;
+}
