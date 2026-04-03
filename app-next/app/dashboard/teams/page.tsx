@@ -21,11 +21,24 @@ export default async function TeamsPage() {
     .eq('user_id', user.id)
     .single()
 
-  const { data: teamsRaw } = await supabase
+  if (!profile?.club_id) {
+    return (
+      <div className="p-6 md:p-10 max-w-5xl mx-auto">
+        <h1 className="text-3xl font-black tracking-tight">Teams</h1>
+        <p className="text-gray mt-4">No club found. Please complete onboarding.</p>
+      </div>
+    )
+  }
+
+  const { data: teamsRaw, error: teamsError } = await supabase
     .from('teams')
     .select('id, name, age_group')
-    .eq('club_id', profile?.club_id ?? '')
+    .eq('club_id', profile.club_id)
     .order('age_group', { ascending: true })
+
+  if (teamsError) {
+    console.error('Teams query error:', teamsError.message)
+  }
 
   // Get member counts for each team
   const teams: Team[] = await Promise.all(
