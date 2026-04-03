@@ -15,10 +15,12 @@ export default async function DashboardPage() {
     .single()
 
   // Count teams in the club
-  const { count: teamCount } = await supabase
-    .from('teams')
-    .select('id', { count: 'exact', head: true })
-    .eq('club_id', profile?.club_id ?? '')
+  const { count: teamCount } = profile?.club_id
+    ? await supabase
+        .from('teams')
+        .select('id', { count: 'exact', head: true })
+        .eq('club_id', profile.club_id)
+    : { count: 0 }
 
   const displayName = profile?.display_name ?? user.email?.split('@')[0] ?? 'there'
   const isNewClub = (teamCount ?? 0) <= 1

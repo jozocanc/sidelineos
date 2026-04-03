@@ -1,0 +1,96 @@
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+
+export default async function SettingsPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('club_id, display_name')
+    .eq('user_id', user.id)
+    .single()
+
+  const { data: club } = await supabase
+    .from('clubs')
+    .select('id, name')
+    .eq('id', profile?.club_id ?? '')
+    .single()
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
+  return (
+    <div className="p-6 md:p-10 max-w-3xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-black tracking-tight">Settings</h1>
+        <p className="text-gray text-sm mt-1">Manage your club settings</p>
+      </div>
+
+      <div className="space-y-6">
+        {/* Club info */}
+        <section className="bg-dark-secondary rounded-2xl p-6 border border-white/5">
+          <h2 className="text-lg font-bold mb-4">Club Information</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray mb-1">Club Name</label>
+              <div className="bg-dark rounded-xl px-4 py-3 border border-white/5">
+                <p className="text-white">{club?.name ?? '—'}</p>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray mb-1">Club ID</label>
+              <div className="bg-dark rounded-xl px-4 py-3 border border-white/5">
+                <p className="text-gray text-sm font-mono">{club?.id ?? '—'}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Account info */}
+        <section className="bg-dark-secondary rounded-2xl p-6 border border-white/5">
+          <h2 className="text-lg font-bold mb-4">Account</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray mb-1">Display Name</label>
+              <div className="bg-dark rounded-xl px-4 py-3 border border-white/5">
+                <p className="text-white">{profile?.display_name ?? '—'}</p>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray mb-1">Email</label>
+              <div className="bg-dark rounded-xl px-4 py-3 border border-white/5">
+                <p className="text-white">{user.email ?? '—'}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Club invite link */}
+        <section className="bg-dark-secondary rounded-2xl p-6 border border-white/5">
+          <h2 className="text-lg font-bold mb-2">Club Coaches Link</h2>
+          <p className="text-gray text-sm mb-4">
+            Use the Coaches page to generate invite links for specific coaches or teams.
+          </p>
+          <a
+            href="/dashboard/coaches"
+            className="inline-block text-sm font-bold text-green hover:underline"
+          >
+            Go to Coaches page →
+          </a>
+        </section>
+
+        {/* Future settings placeholder */}
+        <section className="bg-dark-secondary rounded-2xl p-6 border border-white/5 opacity-50">
+          <h2 className="text-lg font-bold mb-2">Notifications</h2>
+          <p className="text-gray text-sm">Coming soon — configure email and push notification preferences.</p>
+        </section>
+
+        <section className="bg-dark-secondary rounded-2xl p-6 border border-white/5 opacity-50">
+          <h2 className="text-lg font-bold mb-2">Billing</h2>
+          <p className="text-gray text-sm">Coming soon — manage your subscription and billing details.</p>
+        </section>
+      </div>
+    </div>
+  )
+}

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import AddTeamForm from './add-team-form'
 
 interface Team {
@@ -65,7 +66,10 @@ export default async function TeamsPage() {
 
 function TeamCard({ team }: { team: Team }) {
   return (
-    <div className="bg-dark-secondary rounded-2xl p-6 border border-white/5 hover:border-green/20 transition-colors">
+    <Link
+      href={`/dashboard/teams/${team.id}`}
+      className="bg-dark-secondary rounded-2xl p-6 border border-white/5 hover:border-green/20 transition-colors block"
+    >
       <div className="flex items-start justify-between mb-3">
         <h3 className="font-bold text-lg leading-tight">{team.name}</h3>
         <span className="text-xs font-bold bg-green/10 text-green px-2 py-1 rounded-full shrink-0 ml-2">
@@ -75,6 +79,6 @@ function TeamCard({ team }: { team: Team }) {
       <p className="text-gray text-sm">
         {team.member_count} member{team.member_count !== 1 ? 's' : ''}
       </p>
-    </div>
+    </Link>
   )
 }
