@@ -1,12 +1,13 @@
-export default function Home() {
-  return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-black uppercase tracking-tight mb-4">
-          Sideline<span className="text-green">OS</span>
-        </h1>
-        <p className="text-gray text-lg">App scaffold ready</p>
-      </div>
-    </main>
-  );
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+
+export default async function Home() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    redirect('/dashboard')
+  } else {
+    redirect('/login')
+  }
 }
