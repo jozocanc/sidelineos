@@ -1,0 +1,206 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState } from 'react'
+
+interface NavItem {
+  label: string
+  href: string
+  icon: React.ReactNode
+  disabled?: boolean
+}
+
+function HomeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  )
+}
+
+function TeamsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  )
+}
+
+function CalendarIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  )
+}
+
+function CoachesIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  )
+}
+
+function MessageIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41" />
+    </svg>
+  )
+}
+
+function MenuIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  )
+}
+
+const navItems: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', icon: <HomeIcon /> },
+  { label: 'Teams', href: '/dashboard/teams', icon: <TeamsIcon /> },
+  { label: 'Schedule', href: '/dashboard/schedule', icon: <CalendarIcon />, disabled: true },
+  { label: 'Coaches', href: '/dashboard/coaches', icon: <CoachesIcon /> },
+  { label: 'Messages', href: '/dashboard/messages', icon: <MessageIcon />, disabled: true },
+  { label: 'Settings', href: '/dashboard/settings', icon: <SettingsIcon /> },
+]
+
+interface SidebarProps {
+  userEmail: string
+}
+
+export default function Sidebar({ userEmail }: SidebarProps) {
+  const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
+      {/* Logo */}
+      <div className="px-6 py-6 border-b border-white/5">
+        <span className="text-xl font-black uppercase tracking-tight">
+          Sideline<span className="text-green">OS</span>
+        </span>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {navItems.map(item => {
+          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+
+          if (item.disabled) {
+            return (
+              <div
+                key={item.label}
+                title="Coming Soon"
+                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-not-allowed opacity-40"
+              >
+                <span className="text-gray">{item.icon}</span>
+                <span className="text-gray text-sm font-medium">{item.label}</span>
+                <span className="ml-auto text-xs bg-dark rounded px-1.5 py-0.5 text-gray">Soon</span>
+              </div>
+            )
+          }
+
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors relative
+                ${isActive
+                  ? 'bg-dark-secondary text-white'
+                  : 'text-gray hover:text-white hover:bg-dark-secondary/50'
+                }`}
+            >
+              {isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-green rounded-r-full" />
+              )}
+              <span className={isActive ? 'text-green' : ''}>{item.icon}</span>
+              <span className="text-sm font-medium">{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* User info + sign out */}
+      <div className="px-4 py-4 border-t border-white/5">
+        <div className="mb-3">
+          <p className="text-xs text-gray truncate">{userEmail}</p>
+        </div>
+        <form action="/auth/signout" method="POST">
+          <button
+            type="submit"
+            className="w-full text-left text-sm text-gray hover:text-red transition-colors px-1 py-1"
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex flex-col w-64 min-h-screen bg-dark border-r border-white/5 shrink-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile: hamburger button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-dark-secondary rounded-lg text-white"
+        onClick={() => setMobileOpen(o => !o)}
+        aria-label="Toggle menu"
+      >
+        {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+      </button>
+
+      {/* Mobile: overlay */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/60"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile: slide-in sidebar */}
+      <aside
+        className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-dark border-r border-white/5 flex flex-col transform transition-transform duration-200 ease-in-out
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        {sidebarContent}
+      </aside>
+    </>
+  )
+}
