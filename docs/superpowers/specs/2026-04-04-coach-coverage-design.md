@@ -47,6 +47,9 @@ The coach coverage system handles the chaos when a coach can't make an event. In
 - coverage_requests(status) WHERE status IN ('pending', 'escalated')
 - coverage_requests(timeout_at) WHERE status = 'pending'
 
+**Constraints:**
+- UNIQUE(event_id, unavailable_coach_id) WHERE status IN ('pending', 'escalated') — prevent duplicate active requests per coach per event
+
 ### `coverage_responses`
 
 | Column | Type | Notes |
@@ -116,9 +119,14 @@ CREATE POLICY coverage_responses_coach_read ON coverage_responses FOR SELECT
     SELECT id FROM coverage_requests WHERE club_id IN (SELECT get_user_club_ids())
   ));
 
--- Coaches: insert their own response
+-- Coaches: insert their own response (must be in same club as the request)
 CREATE POLICY coverage_responses_coach_insert ON coverage_responses FOR INSERT
-  WITH CHECK (coach_id IN (SELECT get_user_profile_ids()));
+  WITH CHECK (
+    coach_id IN (SELECT get_user_profile_ids())
+    AND coverage_request_id IN (
+      SELECT id FROM coverage_requests WHERE club_id IN (SELECT get_user_club_ids())
+    )
+  );
 ```
 
 ## Coverage Flow
@@ -130,6 +138,10 @@ CREATE POLICY coverage_responses_coach_insert ON coverage_responses FOR INSERT
 5. **Coach declines** — `coverage_responses` row with `declined`. Request stays `pending`.
 6. **Timeout** — If `timeout_at` passes with no acceptance, `status` → `escalated`. DOC gets escalation notification.
 7. **DOC assigns** — DOC picks a coach from coverage dashboard. `status` → `resolved`, `covering_coach_id` set. Same notifications as acceptance.
+
+**Race condition on acceptance:** Two coaches may click "Accept" simultaneously. The server action must use an atomic update: `UPDATE coverage_requests SET status = 'accepted', covering_coach_id = $1 WHERE id = $2 AND status = 'pending'`. If 0 rows updated, the request was already taken — return a "already covered" message to the second coach.
+
+**Status distinction:** `accepted` means a coach voluntarily accepted the request. `resolved` means the DOC manually assigned a coach. Both result in coverage, but the distinction enables tracking how coverage was obtained.
 
 **Timeout checking:** Lazy evaluation on page load. When schedule page or coverage dashboard loads, query for requests where `timeout_at < now() AND status = 'pending'` and flip to `escalated`. No background job needed.
 
@@ -214,6 +226,8 @@ Add "Coverage" nav item between Schedule and Coaches (DOC only). Shows a badge c
 ## File Structure
 
 ```
+app-next/lib/constants.ts                              # (modify) Add COVERAGE_STATUSES, COVERAGE_RESPONSE_TYPES
+
 supabase/migrations/
 └── 007_coach_coverage.sql                    # club_settings, coverage_requests, coverage_responses + RLS
 
@@ -226,6 +240,7 @@ app-next/app/dashboard/coverage/
 
 app-next/app/dashboard/schedule/
 ├── event-card.tsx                             # (modify) Add coverage badges + Can't Attend button
+├── schedule-client.tsx                        # (modify) Pass coverage data to event cards
 ├── cant-attend-modal.tsx                      # Modal for DOC to pick which coach is unavailable
 ├── coverage-actions-inline.tsx                # Accept/Decline buttons shown on events needing coverage
 └── actions.ts                                 # (modify) Add coverage-related queries to getScheduleData
