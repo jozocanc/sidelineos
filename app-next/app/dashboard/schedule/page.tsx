@@ -11,6 +11,8 @@ export default async function SchedulePage() {
         teams={data.teams}
         venues={data.venues}
         userRole={data.userRole}
+        coverageRequests={data.coverageRequests}
+        userProfileId={data.userProfileId}
       />
     </div>
   )

@@ -7,6 +7,7 @@ import Filters from './filters'
 import AgendaView from './agenda-view'
 import CalendarView from './calendar-view'
 import EventModal from './event-modal'
+import CantAttendModal from './cant-attend-modal'
 import { cancelEvent } from './actions'
 
 interface Event {
@@ -41,14 +42,24 @@ interface ScheduleClientProps {
   teams: Team[]
   venues: Venue[]
   userRole: string
+  coverageRequests: Array<{
+    id: string
+    event_id: string
+    status: string
+    covering_coach_id: string | null
+    unavailable_coach_id: string
+    profiles: any
+  }>
+  userProfileId: string
 }
 
-export default function ScheduleClient({ events, teams, venues, userRole }: ScheduleClientProps) {
+export default function ScheduleClient({ events, teams, venues, userRole, coverageRequests, userProfileId }: ScheduleClientProps) {
   const [view, setView] = useState<'agenda' | 'calendar'>('agenda')
   const [filterTeam, setFilterTeam] = useState<string | null>(null)
   const [filterType, setFilterType] = useState<EventType | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [editEvent, setEditEvent] = useState<Event | null>(null)
+  const [cantAttendEventId, setCantAttendEventId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
 
   const canEdit = userRole === ROLES.DOC || userRole === ROLES.COACH
@@ -144,13 +155,27 @@ export default function ScheduleClient({ events, teams, venues, userRole }: Sche
           events={filtered}
           onEdit={handleEdit}
           onCancel={handleCancel}
+          onCantAttend={canEdit ? setCantAttendEventId : undefined}
           canEdit={canEdit}
+          coverageRequests={coverageRequests}
+          userRole={userRole}
+          userProfileId={userProfileId}
         />
       ) : (
         <CalendarView
           events={filtered}
           onEdit={handleEdit}
           onAddAtDate={handleAddAtDate}
+        />
+      )}
+
+      {/* Can't Attend Modal */}
+      {cantAttendEventId && (
+        <CantAttendModal
+          eventId={cantAttendEventId}
+          userProfileId={userProfileId}
+          userRole={userRole}
+          onClose={() => setCantAttendEventId(null)}
         />
       )}
 

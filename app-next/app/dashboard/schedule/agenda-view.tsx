@@ -21,9 +21,20 @@ interface AgendaViewProps {
   onEdit: (eventId: string) => void
   onCancel: (eventId: string) => void
   canEdit: boolean
+  onCantAttend?: (eventId: string) => void
+  coverageRequests: Array<{
+    id: string
+    event_id: string
+    status: string
+    covering_coach_id: string | null
+    unavailable_coach_id: string
+    profiles: any
+  }>
+  userRole: string
+  userProfileId: string
 }
 
-export default function AgendaView({ events, onEdit, onCancel, canEdit }: AgendaViewProps) {
+export default function AgendaView({ events, onEdit, onCancel, canEdit, onCantAttend, coverageRequests, userRole, userProfileId }: AgendaViewProps) {
   if (events.length === 0) {
     return (
       <div className="bg-dark-secondary rounded-2xl p-12 text-center border border-white/5">
@@ -51,6 +62,13 @@ export default function AgendaView({ events, onEdit, onCancel, canEdit }: Agenda
                 onEdit={onEdit}
                 onCancel={onCancel}
                 canEdit={canEdit}
+                onCantAttend={onCantAttend}
+                coverageRequest={coverageRequests.find(cr => cr.event_id === event.id) ?? null}
+                showCoverageActions={(() => {
+                  const cr = coverageRequests.find(cr2 => cr2.event_id === event.id)
+                  if (!cr || cr.status !== 'pending') return false
+                  return cr.unavailable_coach_id !== userProfileId && userRole === 'coach'
+                })()}
               />
             ))}
           </div>

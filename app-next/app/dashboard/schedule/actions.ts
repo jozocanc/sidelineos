@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { checkAndEscalateTimeouts } from '../coverage/actions'
 
 // ---------- Types ----------
 
@@ -314,10 +315,22 @@ export async function getScheduleData() {
     .eq('club_id', profile.club_id!)
     .order('name')
 
+  // Check coverage timeouts
+  await checkAndEscalateTimeouts()
+
+  // Get coverage requests for events
+  const { data: coverageRequests } = await supabase
+    .from('coverage_requests')
+    .select('id, event_id, status, covering_coach_id, unavailable_coach_id, profiles!coverage_requests_covering_coach_id_fkey ( display_name )')
+    .eq('club_id', profile.club_id!)
+    .in('status', ['pending', 'accepted', 'escalated', 'resolved'])
+
   return {
     events: events ?? [],
     teams: teams ?? [],
     venues: venues ?? [],
+    coverageRequests: coverageRequests ?? [],
     userRole: profile.role,
+    userProfileId: profile.id,
   }
 }

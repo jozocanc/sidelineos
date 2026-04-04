@@ -1,6 +1,7 @@
 'use client'
 
 import { EVENT_TYPE_LABELS, type EventType } from '@/lib/constants'
+import CoverageActionsInline from './coverage-actions-inline'
 
 interface EventCardProps {
   event: {
@@ -18,9 +19,17 @@ interface EventCardProps {
   onEdit: (eventId: string) => void
   onCancel: (eventId: string) => void
   canEdit: boolean
+  onCantAttend?: (eventId: string) => void
+  coverageRequest?: {
+    id: string
+    status: string
+    covering_coach_id: string | null
+    profiles: any
+  } | null
+  showCoverageActions?: boolean
 }
 
-export default function EventCard({ event, onEdit, onCancel, canEdit }: EventCardProps) {
+export default function EventCard({ event, onEdit, onCancel, canEdit, onCantAttend, coverageRequest, showCoverageActions }: EventCardProps) {
   const start = new Date(event.start_time)
   const end = new Date(event.end_time)
   const isCancelled = event.status === 'cancelled'
@@ -52,6 +61,21 @@ export default function EventCard({ event, onEdit, onCancel, canEdit }: EventCar
                 ↻
               </span>
             )}
+            {coverageRequest && coverageRequest.status === 'pending' && (
+              <span className="text-xs font-bold bg-yellow-500/10 text-yellow-500 px-2 py-0.5 rounded-full">
+                Needs Coverage
+              </span>
+            )}
+            {coverageRequest && coverageRequest.status === 'escalated' && (
+              <span className="text-xs font-bold bg-red/10 text-red px-2 py-0.5 rounded-full">
+                Escalated
+              </span>
+            )}
+            {coverageRequest && (coverageRequest.status === 'accepted' || coverageRequest.status === 'resolved') && (
+              <span className="text-xs font-bold bg-green/10 text-green px-2 py-0.5 rounded-full">
+                Covered{(() => { const p = Array.isArray(coverageRequest.profiles) ? coverageRequest.profiles[0] : coverageRequest.profiles; return p?.display_name ? ` by ${p.display_name}` : '' })()}
+              </span>
+            )}
           </div>
           <p className={`font-bold ${isCancelled ? 'line-through text-gray' : 'text-white'}`}>
             {event.title}
@@ -81,7 +105,18 @@ export default function EventCard({ event, onEdit, onCancel, canEdit }: EventCar
             </button>
           </div>
         )}
+        {onCantAttend && !isCancelled && !coverageRequest && (
+          <button
+            onClick={() => onCantAttend(event.id)}
+            className="text-yellow-500 hover:text-yellow-400 text-sm transition-colors shrink-0"
+          >
+            Can&apos;t Attend
+          </button>
+        )}
       </div>
+      {showCoverageActions && coverageRequest?.status === 'pending' && (
+        <CoverageActionsInline requestId={coverageRequest.id} />
+      )}
     </div>
   )
 }
