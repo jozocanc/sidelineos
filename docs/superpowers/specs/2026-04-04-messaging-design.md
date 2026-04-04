@@ -58,7 +58,12 @@ Add to the existing `notifications.type` CHECK constraint:
 | `announcement_posted` | All members of targeted team (or all club members if club-wide) | "[Author] posted: [Title]" |
 | `announcement_reply` | Announcement author only | "[Replier] replied to your announcement: [Title]" |
 
-**Note:** `notifications.event_id` is NOT NULL in the current schema, but announcements aren't events. The migration must ALTER `notifications.event_id` to be nullable, or add an `announcement_id` column. Recommended: make `event_id` nullable since notifications are now used for non-event things (coverage, messaging).
+**Notification schema change:** The migration must:
+1. Make `event_id` nullable: `ALTER TABLE notifications ALTER COLUMN event_id DROP NOT NULL`
+2. Add `announcement_id` column: `ALTER TABLE notifications ADD COLUMN announcement_id uuid REFERENCES announcements(id) ON DELETE CASCADE`
+3. Add source check: `ALTER TABLE notifications ADD CONSTRAINT notifications_source_check CHECK (event_id IS NOT NULL OR announcement_id IS NOT NULL)`
+
+This ensures every notification links to either an event or an announcement, and announcement notifications can navigate to the source.
 
 ## Row-Level Security
 
@@ -115,9 +120,16 @@ CREATE POLICY replies_member_read ON announcement_replies FOR SELECT
     AND (team_id IS NULL OR team_id IN (SELECT get_user_team_ids()))
   ));
 
--- All members: post replies
+-- All members: post replies (must be able to see the parent announcement)
 CREATE POLICY replies_member_insert ON announcement_replies FOR INSERT
-  WITH CHECK (author_id IN (SELECT get_user_profile_ids()));
+  WITH CHECK (
+    author_id IN (SELECT get_user_profile_ids())
+    AND announcement_id IN (
+      SELECT id FROM announcements
+      WHERE club_id IN (SELECT get_user_club_ids())
+      AND (team_id IS NULL OR team_id IN (SELECT get_user_team_ids()))
+    )
+  );
 
 -- DOC can delete any reply in their club, others delete own only
 CREATE POLICY replies_delete ON announcement_replies FOR DELETE
