@@ -38,6 +38,15 @@ export default async function DashboardPage() {
         .lte('start_time', todayEnd.toISOString())
     : { count: 0 }
 
+  // Count active coverage requests (pending + escalated)
+  const { count: coverageAlerts } = profile?.club_id
+    ? await supabase
+        .from('coverage_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('club_id', profile.club_id)
+        .in('status', ['pending', 'escalated'])
+    : { count: 0 }
+
   const displayName = profile?.display_name ?? user.email?.split('@')[0] ?? 'there'
   const isNewClub = (teamCount ?? 0) <= 1
 
@@ -65,9 +74,8 @@ export default async function DashboardPage() {
         />
         <StatCard
           label="Coverage Alerts"
-          value="0"
-          accent="gray"
-          note="Coming soon"
+          value={String(coverageAlerts ?? 0)}
+          accent={(coverageAlerts ?? 0) > 0 ? 'green' : 'gray'}
         />
       </div>
 
