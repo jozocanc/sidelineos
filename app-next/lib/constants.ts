@@ -41,3 +41,16 @@ export const DAYS_OF_WEEK = [
   { value: 5, label: 'Fri' },
   { value: 6, label: 'Sat' },
 ] as const
+
+export const COVERAGE_STATUSES = ['pending', 'accepted', 'escalated', 'resolved'] as const
+export type CoverageStatus = (typeof COVERAGE_STATUSES)[number]
+
+export const COVERAGE_STATUS_LABELS: Record<CoverageStatus, string> = {
+  pending: 'Needs Coverage',
+  accepted: 'Covered',
+  escalated: 'Escalated',
+  resolved: 'Covered',
+}
+
+export const COVERAGE_RESPONSE_TYPES = ['accepted', 'declined'] as const
+export type CoverageResponseType = (typeof COVERAGE_RESPONSE_TYPES)[number]
